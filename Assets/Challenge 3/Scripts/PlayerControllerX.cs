@@ -5,6 +5,8 @@ using UnityEngine;
 public class PlayerControllerX : MonoBehaviour
 {
     public bool gameOver;
+    public bool isLowEnough = true;
+    public float maxHeight = 15.0f;
 
     public float floatForce;
     private float gravityModifier = 1.5f;
@@ -33,8 +35,17 @@ public class PlayerControllerX : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (transform.position.y < maxHeight)
+        {
+            isLowEnough = true;
+        }
+        else
+        {
+            isLowEnough = false;
+            playerRb.AddForce(Vector3.down);
+        }
         // While space is pressed and player is low enough, float up
-        if (Input.GetKey(KeyCode.Space))
+        if (Input.GetKey(KeyCode.Space) && isLowEnough)
         {
             playerRb.AddForce(Vector3.up * floatForce);
         }
@@ -60,7 +71,11 @@ public class PlayerControllerX : MonoBehaviour
             Destroy(other.gameObject);
 
         }
-
+        else if (other.gameObject.CompareTag("GROUND") && !gameOver)
+        {
+            playerRb.AddForce(Vector3.up * floatForce, ForceMode.Impulse);
+            playerAudio.PlayOneShot(moneySound, 1.0f); 
+        }
     }
 
 }
